@@ -1,10 +1,11 @@
-cd ~/Project
-
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 
 # Path to your oh-my-zsh installation.
 export ZSH="/home/orey/.oh-my-zsh"
+
+# Директория по умолчанию
+cd ~/Project
 
 ### Theme ###
 # See https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
@@ -15,6 +16,7 @@ POWERLEVEL9K_PROMPT_ON_NEWLINE=true
 POWERLEVEL9K_MULTILINE_LAST_PROMPT_PREFIX="▶ "
 POWERLEVEL9K_MULTILINE_FIRST_PROMPT_PREFIX=""
 
+ENABLE_CORRECTION="true"
 
 # Would you like to use another custom folder than $ZSH/custom?
 # ZSH_CUSTOM=/path/to/new-custom-folder
@@ -22,7 +24,17 @@ POWERLEVEL9K_MULTILINE_FIRST_PROMPT_PREFIX=""
 ### Plugins ###
 # Standard plugins can be found in ~/.oh-my-zsh/plugins/*
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
-plugins=(git npm vagrant composer sudo web-search laravel5)
+plugins=(
+    git 
+    npm 
+    vagrant 
+    composer 
+    sudo 
+    web-search 
+    laravel5
+    docker
+    colored-man-pages
+)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -32,6 +44,8 @@ alias c='clear'
 alias x='exit'
 # Visual Code
 alias vs='/snap/bin/code'
+# MC Edit
+alias edit='mcedit'
 # ZSH Config
 alias zconf="vs ~/.zshrc"
 alias ohmyzsh="cd ~/.oh-my-zsh"
@@ -111,7 +125,16 @@ apache-delete-site() {
 }
 
 # Laravel
-alias lar='php artisan'
+alias lar='php artisan' 
+
+# Обновляем конфигурацию ZSH в репозитории
+gitzsh() {
+    cp ~/.zshrc ~/Project/_zsh/.zshrc
+    cd ~/Project/_zsh
+    git add .
+    git commit -m "$1"
+    git push -u origin master 
+}
 
 # Sources
 source /home/orey/.zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
