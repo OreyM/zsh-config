@@ -64,27 +64,39 @@ alias apache-status='sudo service apache2 status'
 alias apache-start='sudo service apache2 start'
 alias apache-restart='sudo service apache2 restart'
 alias apache-stop='sudo service apache2 stop'
-# Директория с конфигуратором сайтов
-alias apache-sites-conf-dir='cd /etc/apache2/sites-enabled/'
+# Вывести список всех виртуальных сайтов
+alias apache-hosts='apache2ctl -S'
 # Создаем новую директорию для сайта
+# apache-make-site $SITE_NAME $USER
 apache-make-site() {
-
-    if [ -d /var/www/"$1".local ]; then
-        echo "\x1b[1;31mСайт $1.local уже существует, выберите другое имя\n\x1b[0m"
-        curl -Is http://"$1".local
-    else 
-        # Создаем новую директорию для сайта
-        sudo mkdir -p "/var/www/$1.local/public"
-        # Копируем тестовую стартовую страницу index.php
-        sudo cp /var/www/index.php "/var/www/$1.local/public/"
-        # Создаем новый кофигурационный файл
-        sudo touch "/etc/apache2/sites-available/$1.local.conf"
-        # Конфигурация
-        if [ ! -d ~/.custom_domain/_site_config ]; then
-            mkdir -p ~/.custom_domain/_site_config
-        fi
-        touch ~/.custom_domain/_site_config/"$1".local.conf
-        echo "<VirtualHost *:80>
+    if [ -z "$1" ]; then
+        # Не указано имя сайта первым параметром
+        echo "\x1b[1;31mНе задано имя сайта [apache-make-site SITE_NAME USER]\x1b[0m"
+    elif [ -z "$2" ]; then
+        # Не указан пользователь вторым параметром
+        echo "\x1b[1;31mНе задан пользователь, для назначения прав [apache-make-site SITE_NAME USER]\x1b[0m"
+        user=$(whoami)
+        echo "\x1b[0;37;44mТекущий пользователь:\x1b[0m $user"
+    else
+        if [ -d /var/www/"$1".local ]; then
+            # Существует ли уже такой сайт
+            echo "\x1b[1;31mСайт $1.local уже существует, выберите другое имя\n\x1b[0m"
+            curl -Is http://"$1".local
+        else 
+            # Создаем новую директорию для сайта
+            sudo mkdir -p "/var/www/$1.local/public"
+            # Копируем тестовую стартовую страницу index.php
+            # sudo cp /var/www/index.php "/var/www/$1.local/public/"
+            # Назначаем права на директорию сайта
+            sudo chown -R "$2":"$2" /var/www/"$1".local
+            # Создаем новый кофигурационный файл
+            sudo touch "/etc/apache2/sites-available/$1.local.conf"
+            # Конфигурация
+            if [ ! -d ~/.custom_domain/_site_config ]; then
+                mkdir -p ~/.custom_domain/_site_config
+            fi
+            touch ~/.custom_domain/_site_config/"$1".local.conf
+            echo "<VirtualHost *:80>
     ServerAdmin admin@$1.local
     ServerName $1.local
     ServerAlias www.$1.local
@@ -93,47 +105,57 @@ apache-make-site() {
     CustomLog \${APACHE_LOG_DIR}/$1.access.log combined
 </VirtualHost>
 # vim: syntax=apache ts=4 sw=4 sts=4 sr noet" > ~/.custom_domain/_site_config/"$1".local.conf
-        sudo cp ~/.custom_domain/_site_config/"$1".local.conf /etc/apache2/sites-available/"$1".local.conf
-        # Подключаем сайт в Apache
-        sudo a2ensite "$1.local.conf"
-        # Добавляем хост
-        sudo sed -i "$ a 127.0.1.1	$1.local" "/etc/hosts" 
-        # Перезагружаем Apache
-        sudo service apache2 restart
-        echo -e "\n"
-        curl -Is http://"$1".local
+            sudo cp ~/.custom_domain/_site_config/"$1".local.conf /etc/apache2/sites-available/"$1".local.conf
+            # Подключаем сайт в Apache
+            sudo a2ensite "$1.local.conf"
+            # Добавляем хост
+            sudo sed -i "$ a 127.0.1.1	$1.local" "/etc/hosts" 
+            # Перезагружаем Apache
+            sudo service apache2 restart
+            echo -e "The server was rebooted\n"
+            curl -Is http://"$1".local
+            cd /var/www/"$1".local
+        fi
     fi
 }
 # Удаляем сайт
 apache-delete-site() {
-    if [ -d /var/www/"$1".local ]; then
-        # Удаляем диреткорию с сайтом
-        sudo rm -rf "/var/www/$1.local"
-        # Удаляем конфигурационный файл сайта
-        sudo rm "/etc/apache2/sites-available/$1.local.conf"
-        # Отключаем сайт от сервера
-        sudo a2dissite "$1.local.conf"
-        # Убираем адресс сайта из хоста
-        sudo sed -i "/127.0.1.1	$1.local/d" "/etc/hosts"
-        # Перезагружаем Apache
-        sudo service apache2 restart
-        echo -e "\x1b[1;42mСайт удален. Сервер перезагружен\x1b[0m\n"
+    if [ -z "$1" ]; then
+        # Не указано имя сайта первым параметром
+        echo "\x1b[1;31mНе задано имя сайта, который необходимо удалить [apache-delete-site SITE_NAME]\x1b[0m"
     else
-        echo "\x1b[1;31mСайт $1.local НЕ существует, проверте имя\n\x1b[0m"
+        if [ -d /var/www/"$1".local ]; then
+            # Удаляем диреткорию с сайтом
+            sudo rm -rf "/var/www/$1.local"
+            # Удаляем конфигурационный файл сайта
+            sudo rm "/etc/apache2/sites-available/$1.local.conf"
+            # Отключаем сайт от сервера
+            sudo a2dissite "$1.local.conf"
+            # Убираем адресс сайта из хоста
+            sudo sed -i "/127.0.1.1	$1.local/d" "/etc/hosts"
+            # Перезагружаем Apache
+            sudo service apache2 restart
+            echo -e "\x1b[1;42mСайт удален. Сервер перезагружен\x1b[0m\n"
+        else
+            echo "\x1b[1;31mСайт $1.local НЕ существует, проверте имя\n\x1b[0m"
+        fi
     fi
-    
 }
 
 # Laravel
 alias lar='php artisan' 
 
-# Обновляем конфигурацию ZSH в репозитории
+# Обновляем конфигурацию ZSH в репозитории [gitzsh $COMMIT]
 gitzsh() {
-    cp ~/.zshrc ~/Project/_zsh/.zshrc
-    cd ~/Project/_zsh
-    git add .
-    git commit -m "$1"
-    git push -u origin master 
+    if [ -z "$1" ]; then
+        echo "\x1b[1;31mНе добавлен коммит для git [gitzsh 'COMMIT']\x1b[0m"
+    else
+        cp ~/.zshrc ~/Project/_zsh/.zshrc
+        cd ~/Project/_zsh
+        git add .
+        git commit -m "$1"
+        git push -u origin master
+    fi
 }
 
 # Sources
