@@ -5,7 +5,8 @@
 export ZSH="/home/orey/.oh-my-zsh"
 
 # Директория по умолчанию
-cd ~/Project
+
+cd /var/www && ls -l /var/www
 
 ### Theme ###
 # See https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
@@ -65,85 +66,166 @@ alias apache-start='sudo service apache2 start'
 alias apache-restart='sudo service apache2 restart'
 alias apache-stop='sudo service apache2 stop'
 # Вывести список всех виртуальных сайтов
-alias apache-hosts='apache2ctl -S'
+apache-hosts() {
+    apache2 -v
+    echo "\n"
+    declare -a dirs=(*/)
+    for dir in "${dirs[@]}"; 
+    do  
+        var=${dir%/}
+        echo "<[ \x1b[0;32m http://$var \x1b[0m ]>"; 
+    done
+    echo "\n"
+}
+alias apache-error-check='apache2ctl -t'
 # Создаем новую директорию для сайта
 # apache-make-site $SITE_NAME $USER
 apache-make-site() {
-    if [ -z "$1" ]; then
+    SITE_NAME=$1
+    USER=$(whoami)
+    if [ -z "$SITE_NAME" ]; then
         # Не указано имя сайта первым параметром
         echo "\x1b[1;31mНе задано имя сайта [apache-make-site SITE_NAME USER]\x1b[0m"
-    elif [ -z "$2" ]; then
+    elif [ -z "$USER" ]; then
         # Не указан пользователь вторым параметром
         echo "\x1b[1;31mНе задан пользователь, для назначения прав [apache-make-site SITE_NAME USER]\x1b[0m"
         user=$(whoami)
         echo "\x1b[0;37;44mТекущий пользователь:\x1b[0m $user"
     else
-        if [ -d /var/www/"$1".local ]; then
+        if [ -d /var/www/"$SITE_NAME".local ]; then
             # Существует ли уже такой сайт
-            echo "\x1b[1;31mСайт $1.local уже существует, выберите другое имя\n\x1b[0m"
-            curl -Is http://"$1".local
+            echo "\x1b[1;31mСайт $SITE_NAME.local уже существует, выберите другое имя\n\x1b[0m"
+            curl -Is http://"$SITE_NAME".local
         else 
             # Создаем новую директорию для сайта
-            sudo mkdir -p "/var/www/$1.local/public"
+            sudo mkdir -p "/var/www/$SITE_NAME.local/public"
             # Копируем тестовую стартовую страницу index.php
-            # sudo cp /var/www/index.php "/var/www/$1.local/public/"
+            # sudo cp /var/www/index.php "/var/www/$SITE_NAME.local/public/"
             # Назначаем права на директорию сайта
-            sudo chown -R "$2":"$2" /var/www/"$1".local
+            sudo chown -R "$USER":"$USER" /var/www/"$SITE_NAME".local
             # Создаем новый кофигурационный файл
-            sudo touch "/etc/apache2/sites-available/$1.local.conf"
+            sudo touch "/etc/apache2/sites-available/$SITE_NAME.local.conf"
             # Конфигурация
             if [ ! -d ~/.custom_domain/_site_config ]; then
                 mkdir -p ~/.custom_domain/_site_config
             fi
-            touch ~/.custom_domain/_site_config/"$1".local.conf
+            touch ~/.custom_domain/_site_config/"$SITE_NAME".local.conf
             echo "<VirtualHost *:80>
-    ServerAdmin admin@$1.local
-    ServerName $1.local
-    ServerAlias www.$1.local
-    DocumentRoot /var/www/$1.local/public
-    ErrorLog \${APACHE_LOG_DIR}/$1.error.log
-    CustomLog \${APACHE_LOG_DIR}/$1.access.log combined
+    ServerAdmin admin@$SITE_NAME.local
+    ServerName $SITE_NAME.local
+    ServerAlias www.$SITE_NAME.local
+    DocumentRoot /var/www/$SITE_NAME.local/public
+    ErrorLog \${APACHE_LOG_DIR}/$SITE_NAME.error.log
+    CustomLog \${APACHE_LOG_DIR}/$SITE_NAME.access.log combined
 </VirtualHost>
-# vim: syntax=apache ts=4 sw=4 sts=4 sr noet" > ~/.custom_domain/_site_config/"$1".local.conf
-            sudo cp ~/.custom_domain/_site_config/"$1".local.conf /etc/apache2/sites-available/"$1".local.conf
+# vim: syntax=apache ts=4 sw=4 sts=4 sr noet" > ~/.custom_domain/_site_config/"$SITE_NAME".local.conf
+            sudo cp ~/.custom_domain/_site_config/"$SITE_NAME".local.conf /etc/apache2/sites-available/"$SITE_NAME".local.conf
             # Подключаем сайт в Apache
-            sudo a2ensite "$1.local.conf"
+            sudo a2ensite "$SITE_NAME.local.conf"
             # Добавляем хост
-            sudo sed -i "$ a 127.0.1.1	$1.local" "/etc/hosts" 
+            sudo sed -i "$ a 127.0.1.1	$SITE_NAME.local" "/etc/hosts" 
             # Перезагружаем Apache
             sudo service apache2 restart
             echo -e "The server was rebooted\n"
-            curl -Is http://"$1".local
-            cd /var/www/"$1".local
+            curl -Is http://"$SITE_NAME".local
+            cd /var/www/"$SITE_NAME".local
+            vs /var/www/"$SITE_NAME".local
         fi
     fi
 }
 # Удаляем сайт
 apache-delete-site() {
-    if [ -z "$1" ]; then
+    SITE_NAME=$1
+
+    if [ -z "$SITE_NAME" ]; then
         # Не указано имя сайта первым параметром
         echo "\x1b[1;31mНе задано имя сайта, который необходимо удалить [apache-delete-site SITE_NAME]\x1b[0m"
     else
-        if [ -d /var/www/"$1".local ]; then
+        if [ -d /var/www/"$SITE_NAME".local ]; then
             # Удаляем диреткорию с сайтом
-            sudo rm -rf "/var/www/$1.local"
+            sudo rm -rf "/var/www/$SITE_NAME.local"
             # Удаляем конфигурационный файл сайта
-            sudo rm "/etc/apache2/sites-available/$1.local.conf"
+            sudo rm "/etc/apache2/sites-available/$SITE_NAME.local.conf"
             # Отключаем сайт от сервера
-            sudo a2dissite "$1.local.conf"
+            sudo a2dissite "$SITE_NAME.local.conf"
             # Убираем адресс сайта из хоста
-            sudo sed -i "/127.0.1.1	$1.local/d" "/etc/hosts"
+            sudo sed -i "/127.0.1.1	$SITE_NAME.local/d" "/etc/hosts"
             # Перезагружаем Apache
             sudo service apache2 restart
             echo -e "\x1b[1;42mСайт удален. Сервер перезагружен\x1b[0m\n"
         else
-            echo "\x1b[1;31mСайт $1.local НЕ существует, проверте имя\n\x1b[0m"
+            echo "\x1b[1;31mСайт $SITE_NAME.local НЕ существует, проверте имя\n\x1b[0m"
         fi
     fi
 }
 
 # Laravel
-alias lar='php artisan' 
+alias lar='php artisan'
+
+# laravel-create-project PROJECT_NAME VERSION
+laravel-create-project(){
+    PROJECT_NAME=$1;
+    VERSION=$2
+    USER=$(whoami)
+
+    if [ -z "$PROJECT_NAME" ]; then
+        # Не указано имя сайта первым параметром
+        echo "\x1b[1;31mНе задано имя сайта [apache-make-site PROJECT_NAME VERSION USER]\x1b[0m"
+    elif [ -z "$VERSION" ]; then
+        echo "\x1b[1;31mНе указана версия пакета Laravel [apache-make-site PROJECT_NAME VERSION USER]\x1b[0m"
+    else
+        if [ -d /var/www/"$PROJECT_NAME".local ]; then
+            echo "\x1b[1;31mСайт $PROJECT_NAME.local уже существует, выберите другое имя\n\x1b[0m"
+            curl -Is http://"$PROJECT_NAME".local
+        else 
+            sudo chown -R "$USER":"$USER" /var/www
+            cd "/var/www/"
+            composer create-project laravel/laravel="$VERSION.*" "$PROJECT_NAME".local
+            sudo chown -R "$USER":"$USER" /var/www/"$PROJECT_NAME".local
+            sudo touch "/etc/apache2/sites-available/$PROJECT_NAME.local.conf"
+            if [ ! -d ~/.custom_domain/_site_config ]; then
+                mkdir -p ~/.custom_domain/_site_config
+            fi
+            touch ~/.custom_domain/_site_config/"$PROJECT_NAME".local.conf
+            echo "<VirtualHost *:80>
+        ServerAdmin admin@$PROJECT_NAME.local
+        ServerName $PROJECT_NAME.local
+        ServerAlias www.$PROJECT_NAME.local
+        DocumentRoot /var/www/$PROJECT_NAME.local/public
+        ErrorLog \${APACHE_LOG_DIR}/$PROJECT_NAME.error.log
+        CustomLog \${APACHE_LOG_DIR}/$PROJECT_NAME.access.log combined
+    </VirtualHost>
+    # vim: syntax=apache ts=4 sw=4 sts=4 sr noet" > ~/.custom_domain/_site_config/"$PROJECT_NAME".local.conf
+            sudo cp ~/.custom_domain/_site_config/"$PROJECT_NAME".local.conf /etc/apache2/sites-available/"$PROJECT_NAME".local.conf
+            sudo a2ensite "$PROJECT_NAME.local.conf"
+            sudo sed -i "$ a 127.0.1.1	$PROJECT_NAME.local" "/etc/hosts" 
+            sudo service apache2 restart
+            echo -e "The server was rebooted\n"
+            cd /var/www/"$PROJECT_NAME".local
+            sudo chmod 777 -R storage && sudo chmod 777 -R bootstrap/cache
+            composer require barryvdh/laravel-debugbar --dev
+            npm install
+            npm run dev  
+            php artisan cache:clear
+            echo "\n"
+            echo "\x1b[0;32mNode ver:\x1b[0m" $(node --version)
+            echo "\x1b[0;32mNPM ver:\x1b[0m" $(npm --version)
+            composer --version
+            php -v
+            php artisan --version
+            echo "\n"
+            curl -Is http://"$SITE_NAME".local
+            echo "\n"
+            echo "\x1b[0;32mLaravel development server started:\x1b[0m <[ http://$PROJECT_NAME.local ]>"
+            vs /var/www/"$PROJECT_NAME".local
+            echo "\n"
+        fi
+    fi
+}
+
+test(){
+     
+}
 
 # Обновляем конфигурацию ZSH в репозитории [gitzsh $COMMIT]
 gitzsh() {

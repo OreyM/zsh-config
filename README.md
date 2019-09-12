@@ -26,10 +26,18 @@ v. 0.9.11
 * `apache-start` - запуск сервера
 * `apache-restart` - перезагрузка сервера
 * `apache-stop` - остановка сервера
-* `apache-make-site SITE_NAME USER` - создание локального сайта, дача прав к нему указанному пользователю
+* `apache-make-site SITE_NAME` - создание локального сайта, дача прав к нему указанному пользователю
 * `apache-delete-site SITE_NAME` - удаление локального сайта
+* `apache-error-check` - проверка синтаксических ошибок настроек сервера
+* `apache-hosts` - вывести список всех виртуальных сайтов
 
 #### Laravel
+* Cоздание проекта на Laravel, с указанием версии фреймворка. Будет установлена указананя вкоманде версия фреймворка, подключен Laravel Debugbar.
+  
+```
+laravel-create-project SITE_NAME LARAVEL_VERS
+```
+
 * `lar` - php artisan
 
 
@@ -48,14 +56,36 @@ v. 0.9.11
 
 ## Требования
 Должно быть установлено:
+
 * curl
 ```bash
 sudo apt install curl 
 ```
 
+PHP >= 7.2
+
+```
+sudo apt install php7.2 php7.2-fpm php-pear php-pecl php7.2-cli php7.2-curl php7.2-dev libapache2-mod-php7.2 php7.2-mbstring php7.2-xml php7.2-xmlrpc php7.2-zip php7.2-mysql php7.2-imagick php7.2-gd php7.2-tidy php7.2-intl php7.2-recode
+
+# install PHP 7.2 MCrypt
+sudo apt install libmcrypt-dev libreadline-dev
+pecl install mcrypt-1.0.1
+# You should add "extension=mcrypt.so" to php.ini
+```
+
 * GIT
 ```bash
 sudo apt install git
+```
+
+* Composer
+```
+sudo apt install composer
+```
+
+* NPM
+```
+sudo apt install npm
 ```
 
 * MC
