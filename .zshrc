@@ -5,8 +5,7 @@
 export ZSH="/home/orey/.oh-my-zsh"
 
 # Директория по умолчанию
-
-cd /var/www && ls -l /var/www
+cd /var/www
 
 ### Theme ###
 # See https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
@@ -43,10 +42,15 @@ source $ZSH/oh-my-zsh.sh
 # BASH
 alias c='clear'
 alias x='exit'
+alias i='sudo apt install'
+alias my-icc="xrandr | sed -n 's/ connected.*//p' | xargs -n1 -tri xrandr --output {} --brightness 1 --gamma 1:1:1"
+alias group='vs /etc/group'
 # Visual Code
 alias vs='/snap/bin/code'
 # MC Edit
 alias edit='mcedit'
+#PHP Storm
+alias storm='phpstorm'
 # ZSH Config
 alias zconf="vs ~/.zshrc"
 alias ohmyzsh="cd ~/.oh-my-zsh"
@@ -54,7 +58,7 @@ alias ohmyzsh="cd ~/.oh-my-zsh"
 alias linux='screenfetch'
 # Dir
 alias dir-proj='cd ~/Project'
-alias dir-domain='cd ~/Domain'
+alias dir-domain='cd /var/www'
 alias dir-docker='cd ~/Docker'
 # PHP
 alias phpini='sudo vs /etc/php/7.2/cli/php.ini'
@@ -67,6 +71,7 @@ alias apache-restart='sudo service apache2 restart'
 alias apache-stop='sudo service apache2 stop'
 # Вывести список всех виртуальных сайтов
 apache-hosts() {
+    cd /var/www
     apache2 -v
     echo "\n"
     declare -a dirs=(*/)
@@ -203,6 +208,7 @@ laravel-create-project(){
             echo -e "The server was rebooted\n"
             cd /var/www/"$PROJECT_NAME".local
             sudo chmod 777 -R storage && sudo chmod 777 -R bootstrap/cache
+            composer require --dev barryvdh/laravel-ide-helper
             composer require barryvdh/laravel-debugbar --dev
             npm install
             npm run dev  
@@ -221,6 +227,32 @@ laravel-create-project(){
             echo "\n"
         fi
     fi
+}
+
+
+### Docker ###
+alias dc-restart='sudo service docker restart'
+alias dc-images='docker images'
+alias dc-cont='docker ps -a'
+alias dc-start='docker start'
+alias dc-stop='docker stop'
+alias dc-stop-all=''
+alias dc-delete='docker rm'
+alias dc-delete-all='docker rm -v $(docker ps -aq -f status=exited)'
+alias dc-delete-image='docker rmi -f'
+
+dc-commit(){
+    MYAPP="$1"
+    USER="$2"
+    IMAGE="$3"
+
+    docker commit "$MYAPP" "$USER"/"$IMAGE"
+}
+dc-push(){
+    USER="$1"
+    IMAGE="$2"
+
+    docker push "$USER"/"$IMAGE"
 }
 
 test(){
