@@ -175,9 +175,9 @@ laravel-create-project(){
 
     if [ -z "$PROJECT_NAME" ]; then
         # Не указано имя сайта первым параметром
-        echo "\x1b[1;31mНе задано имя сайта [apache-make-site PROJECT_NAME VERSION USER]\x1b[0m"
+        echo "\x1b[1;31mНе задано имя сайта [laravel-create-project PROJECT_NAME VERSION]\x1b[0m"
     elif [ -z "$VERSION" ]; then
-        echo "\x1b[1;31mНе указана версия пакета Laravel [apache-make-site PROJECT_NAME VERSION USER]\x1b[0m"
+        echo "\x1b[1;31mНе указана версия пакета Laravel [laravel-create-project PROJECT_NAME VERSION]\x1b[0m"
     else
         if [ -d /var/www/"$PROJECT_NAME".local ]; then
             echo "\x1b[1;31mСайт $PROJECT_NAME.local уже существует, выберите другое имя\n\x1b[0m"
