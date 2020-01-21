@@ -229,7 +229,6 @@ laravel-create-project(){
     fi
 }
 
-
 ### Docker ###
 alias dc-restart='sudo service docker restart'
 alias dc-images='docker images'
@@ -258,6 +257,17 @@ dc-push(){
 test(){
      
 }
+
+# laradock
+## https://github.com/Laradock/laradock.git
+# DB_HOST=mysql
+# REDIS_HOST=redis
+# QUEUE_HOST=beanstalkd
+alias laradock='git clone https://github.com/Laradock/laradock.git'
+alias laradockenv='cp env-example .env'
+alias dcserve='docker-compose up -d nginx mysql phpmyadmin redis workspace'
+alias dcstop='docker-compose stop'
+alias dcwork='docker-compose exec --user=laradock workspace bash'
 
 # Обновляем конфигурацию ZSH в репозитории [gitzsh $COMMIT]
 gitzsh() {
