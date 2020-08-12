@@ -45,23 +45,38 @@ alias x='exit'
 alias i='sudo apt install'
 alias my-icc="xrandr | sed -n 's/ connected.*//p' | xargs -n1 -tri xrandr --output {} --brightness 1 --gamma 1:1:1"
 alias group='vs /etc/group'
+
 # Visual Code
 alias vs='/snap/bin/code'
+
 # MC Edit
 alias edit='mcedit'
+# alias edit='/usr/local/Cellar/midnight-commander/4.8.22/bin/mcedit'
+
 #PHP Storm
 alias storm='phpstorm'
+
 # ZSH Config
 alias zconf="vs ~/.zshrc"
 alias ohmyzsh="cd ~/.oh-my-zsh"
+
 # OS param
-alias linux='screenfetch'
-# Dir
-alias dir-proj='cd ~/Project'
-alias dir-domain='cd /var/www'
-alias dir-docker='cd ~/Docker'
+alias os='screenfetch'
+
+#DIR Alias
+alias vpath="cd ~/Google/WEB_DEV/_localServer/domains"
+alias localpath="cd ~/domain/"
+alias project="cd ~/_project/"
+alias dockpath="cd ~/_docker/"
+
+#GIT Alias
+alias status='git status'
+alias add='git add .'
+alias push='git push origin master'
+alias pull='git pull'
+
 # PHP
-alias phpini='sudo vs /etc/php/7.2/cli/php.ini'
+alias phpini="cd /usr/local/etc/php/" # + vers PHP, ex 7.3
 
 ### Apache alias ###
 # Управление сервером
@@ -165,7 +180,14 @@ apache-delete-site() {
 }
 
 # Laravel
-alias lar='php artisan'
+alias laravel="~/.composer/vendor/bin/laravel"
+alias larperm='sudo chgrp -R www-data storage bootstrap/cache; sudo chmod -R ug+rwx storage bootstrap/cache'
+alias lara='php artisan'
+alias serve='php artisan serve'
+alias controller='php artisan make:controller'
+alias model='php artisan make:model'
+alias migration='php artisan make:migration'
+alias migrate='php artisan migrate'
 
 # laravel-create-project PROJECT_NAME VERSION
 laravel-create-project(){
@@ -230,32 +252,31 @@ laravel-create-project(){
 }
 
 ### Docker ###
-alias dc-restart='sudo service docker restart'
-alias dc-images='docker images'
-alias dc-cont='docker ps -a'
-alias dc-start='docker start'
-alias dc-stop='docker stop'
-alias dc-stop-all=''
-alias dc-delete='docker rm'
-alias dc-delete-all='docker rm -v $(docker ps -aq -f status=exited)'
-alias dc-delete-image='docker rmi -f'
+alias dres='sudo service docker restart'
+alias dimg='docker images'
+alias dcont='docker ps -a'
+alias dstart='docker start'
+alias dstop='docker stop'
+alias dstop-all=''
+alias ddelete='docker rm'
+alias ddelete-all='docker rm -v $(docker ps -aq -f status=exited)'
+alias ddelete-image='docker rmi -f'
+# Docker compose
+alias dcup='docker-compose up'
+alias dcdown='docker-compose stop'
 
-dc-commit(){
+dcommit(){
     MYAPP="$1"
     USER="$2"
     IMAGE="$3"
 
     docker commit "$MYAPP" "$USER"/"$IMAGE"
 }
-dc-push(){
+dpush(){
     USER="$1"
     IMAGE="$2"
 
     docker push "$USER"/"$IMAGE"
-}
-
-test(){
-     
 }
 
 # laradock
@@ -265,9 +286,13 @@ test(){
 # QUEUE_HOST=beanstalkd
 alias laradock='git clone https://github.com/Laradock/laradock.git'
 alias laradockenv='cp env-example .env'
-alias dcserve='docker-compose up -d nginx mysql phpmyadmin redis workspace'
-alias dcstop='docker-compose stop'
-alias dcwork='docker-compose exec --user=laradock workspace bash'
+alias ldbash='docker-compose exec --user=laradock workspace bash'
+alias ldserve='docker-compose up -d nginx mysql phpmyadmin redis workspace'
+alias ldstop='docker-compose stop'
+alias ldwork='docker-compose exec --user=laradock workspace bash'
+
+#PHPUnit Alias
+alias testy='vendor/bin/phpunit --colors=always'
 
 # Обновляем конфигурацию ZSH в репозитории [gitzsh $COMMIT]
 gitzsh() {
