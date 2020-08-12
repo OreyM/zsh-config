@@ -14,6 +14,7 @@ POWERLEVEL9K_MODE="nerdfont-complete"
 #POWERLEVEL9K_DISABLE_RPROMPT=true
 POWERLEVEL9K_PROMPT_ON_NEWLINE=true
 POWERLEVEL9K_MULTILINE_LAST_PROMPT_PREFIX="▶ "
+#POWERLEVEL9K_MULTILINE_LAST_PROMPT_PREFIX="↳ "
 POWERLEVEL9K_MULTILINE_FIRST_PROMPT_PREFIX=""
 
 ENABLE_CORRECTION="true"
@@ -290,6 +291,11 @@ alias ldbash='docker-compose exec --user=laradock workspace bash'
 alias ldserve='docker-compose up -d nginx mysql phpmyadmin redis workspace'
 alias ldstop='docker-compose stop'
 alias ldwork='docker-compose exec --user=laradock workspace bash'
+
+#NPM
+alias ndev='npm run dev'
+alias nprod='npm run prod'
+alias nwatch='npm run watch'
 
 #PHPUnit Alias
 alias testy='vendor/bin/phpunit --colors=always'
