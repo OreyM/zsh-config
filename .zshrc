@@ -58,8 +58,9 @@ alias edit='mcedit'
 alias storm='phpstorm'
 
 # ZSH Config
-alias zconf="vs ~/.zshrc"
+alias zconf="code ~/.zshrc"
 alias ohmyzsh="cd ~/.oh-my-zsh"
+alias sourcezsh='source ~/.zshrc'
 
 # OS param
 alias os='screenfetch'
@@ -75,6 +76,7 @@ alias status='git status'
 alias add='git add .'
 alias push='git push origin master'
 alias pull='git pull'
+# glog
 
 # PHP
 alias phpini="cd /usr/local/etc/php/" # + vers PHP, ex 7.3
@@ -189,6 +191,8 @@ alias controller='php artisan make:controller'
 alias model='php artisan make:model'
 alias migration='php artisan make:migration'
 alias migrate='php artisan migrate'
+alias refresh='php artisan migrate:refresh --seed'
+alias routelist='php artisan route:list'
 
 # laravel-create-project PROJECT_NAME VERSION
 laravel-create-project(){
