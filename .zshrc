@@ -193,6 +193,8 @@ alias migration='php artisan make:migration'
 alias migrate='php artisan migrate'
 alias refresh='php artisan migrate:refresh --seed'
 alias routelist='php artisan route:list'
+# Генерация PHPDoc для моделей (Laravel IDE Helper)
+alias modelhelp='php artisan ide-helper:models --dir="app/src/Models"'
 
 # laravel-create-project PROJECT_NAME VERSION
 laravel-create-project(){
