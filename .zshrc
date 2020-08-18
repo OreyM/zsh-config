@@ -191,6 +191,7 @@ alias controller='php artisan make:controller'
 alias model='php artisan make:model'
 alias migration='php artisan make:migration'
 alias migrate='php artisan migrate'
+alias seed='php artisan make:seed'
 alias refresh='php artisan migrate:refresh --seed'
 alias routelist='php artisan route:list'
 # Генерация PHPDoc для моделей (Laravel IDE Helper)
